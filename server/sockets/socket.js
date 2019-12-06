@@ -24,9 +24,6 @@ io.on('connection', (client) => {
 
         // Se inidica a los usuarios que un nuevo usuario se conectó
         let personas = usuarios.agregarPersona(client.id, data.nombre, data.sala);
-        console.log(data.sala);
-        console.log(usuarios.getPersonasPorSala(data.sala));
-        console.log(usuarios.getPersonas());
         client.broadcast.to(data.sala).emit('listaPersona', usuarios.getPersonasPorSala(data.sala));
         client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${ data.nombre } se unió`));
 
@@ -35,18 +32,17 @@ io.on('connection', (client) => {
         callback(usuarios.getPersonasPorSala(data.sala));
     });
 
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
         let persona = usuarios.getPersona(client.id);
 
-        let mensaje = crearMensaje(persona, data.mensaje);
+        let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast.emit('crearMensaje', mensaje);
+
+        callback(mensaje);
     });
 
     client.on('disconnect', () => {
         let personaBorrada = usuarios.borrarPersona(client.id);
-        console.log(personaBorrada.sala);
-        console.log(usuarios.getPersonasPorSala(personaBorrada.sala));
-        console.log(usuarios.getPersonas());
         client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} salio del chat`));
         client.broadcast.to(personaBorrada.sala).emit('listaPersona', usuarios.getPersonasPorSala(personaBorrada.sala));
     });

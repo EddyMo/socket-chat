@@ -21,7 +21,6 @@ class Usuarios {
         return personasEnSala;
     }
 
-
     borrarPersona(id) {
         let personaBorrada = this.getPersona(id);
         this.personas = this.personas.filter(persona => persona.id !== id);
